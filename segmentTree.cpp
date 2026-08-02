@@ -3,6 +3,7 @@ class SGTree {
 public:
 	SGTree(int n) {
 		seg.resize(4 * n + 1);
+		lazy.resize(4 * n + 1);
 	}
 
 	void build(int ind, int low, int high, int arr[]) {
@@ -41,5 +42,46 @@ public:
 		if (i <= mid) update(2 * ind + 1, low, mid, i, val);
 		else update(2 * ind + 2, mid + 1, high, i, val);
 		seg[ind] = min(seg[2 * ind + 1], seg[2 * ind + 2]);
+	}
+
+	void update(int ind, int low, int high, int l, int r, int val) {
+	    // Update the previous remaining updates
+	    // and propagate them downwards
+	    if (lazy[ind] != 0) {
+	        seg[ind] += (high - low + 1) * lazy[ind];
+	        // Propagate the lazy update downwards
+	        // for the remaining nodes to get updated
+	        if (low != high) {
+	            lazy[2 * ind + 1] += lazy[ind];
+	            lazy[2 * ind + 2] += lazy[ind];
+	        }
+	        lazy[ind] = 0;
+	    }
+	
+	    // No Overlap
+	    // We don't do anything and return
+	    // (low, high) lies completely outside (l, r)
+	    if (high < l || r < low) {
+	        return;
+	    }
+	
+	    // Complete Overlap
+	    // (low, high) lies completely inside (l, r)
+	    if (low >= l && high <= r) {
+	        seg[ind] += (high - low + 1) * val;
+	        // If not a leaf node,
+	        // mark its children as lazy
+	        if (low != high) {
+	            lazy[2 * ind + 1] += val;
+	            lazy[2 * ind + 2] += val;
+	        }
+	        return;
+    	}
+
+    	// Partial Overlap
+	    int mid = (low + high) >> 1;
+	    update(2 * ind + 1, low, mid, l, r, val);
+	    update(2 * ind + 2, mid + 1, high, l, r, val);
+	    seg[ind] = seg[2 * ind + 1] + seg[2 * ind + 2];
 	}
 };
