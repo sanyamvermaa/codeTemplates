@@ -45,7 +45,7 @@ public:
 		seg[ind] = min(seg[2 * ind + 1], seg[2 * ind + 2]);
 	}
 
-	void update(int ind, int low, int high, int l, int r, int val) {
+	void updateRange(int ind, int low, int high, int l, int r, int val) {
 	    // Update the previous remaining updates
 	    // and propagate them downwards
 	    if (lazy[ind] != 0) {
